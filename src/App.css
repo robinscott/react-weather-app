@@ -1,0 +1,19 @@
+.Flex-container {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: row wrap;
+  flex-flow: row wrap;
+}
+
+.Flex-item {
+  -webkit-flex: 1 0 auto;
+  flex: 1 0 auto;
+}
+
+.Tile {
+  border: 2px solid gray;
+  border-radius: 8px;
+  margin: 5%;
+  height: 300px;
+  text-align: center;
+}
