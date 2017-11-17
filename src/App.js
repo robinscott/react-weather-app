@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { ListGroup, ListGroupItem } from 'react-bootstrap';
 import Overlay from './Overlay';
 import './App.css';
 
@@ -19,11 +20,11 @@ class App extends Component {
     updateDataArray(interval, result) {
         const name = result.name;
         const weather = result.weather[0];
-        const iconSrc = icon_url + result.weather[0].icon + suffix;
-        const temperature = (result.main.temp - 32) * 5 / 9;
+        const iconSrc = icon_url + weather.icon + suffix;
+        const conditions = { ...result.main, ...result.wind };
 
         this.setState({
-            data: [...this.state.data, {name, weather, iconSrc, temperature}]
+            data: [...this.state.data, {name, weather, iconSrc, conditions}]
         });
     }
 
@@ -42,7 +43,11 @@ class App extends Component {
                                     <h3>{obj.name}</h3>
                                     <h2>{obj.weather.description}</h2>
                                     <img src={obj.iconSrc} width='100px' alt={obj.weather.description} />
-                                    <p>{obj.temperature}</p>
+                                    <ListGroup>
+                                        <ListGroupItem><strong>Temperature:</strong> {obj.conditions.temp}&#8451;</ListGroupItem>
+                                        <ListGroupItem><strong>Humidity:</strong> {obj.conditions.humidity}%</ListGroupItem>
+                                        <ListGroupItem><strong>Wind speed:</strong> {obj.conditions.speed}m/s</ListGroupItem>
+                                    </ListGroup>
                                 </div>
                             </div>
                         )

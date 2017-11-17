@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { Modal, Button, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import { Modal, Button, FormGroup, ControlLabel, FormControl, Alert } from 'react-bootstrap';
 import FieldGroup from './FieldGroup';
 
 const url = 'http://api.openweathermap.org/data/2.5/weather';
 const queryString = 'q=';
 const keyQuery = 'APPID=';
 const key = 'c1bbacb38ffa09548e071d66119cf44d';
+const units = 'units=metric';
 
 class Overlay extends Component {
 
@@ -15,7 +16,8 @@ class Overlay extends Component {
         this.state = {
             showModal: false,
             city: '',
-            interval: ''
+            interval: '',
+            showErrorMessage: false
         };
 
         this.close = this.close.bind(this);
@@ -25,7 +27,7 @@ class Overlay extends Component {
     }
 
     close() {
-        this.setState({ showModal: false });
+        this.setState({ showModal: false, showErrorMessage: false });
     }
 
     open() {
@@ -39,21 +41,33 @@ class Overlay extends Component {
     }
 
     handleClick() {
-        const { city, interval } = this.state;
+        const { interval } = this.state;
 
-        fetch(`${url}?${queryString}${city}&${keyQuery}${key}`)
+        this.fetchCityWeatherData().then(data => {
+            if(data.cod && data.message) {
+                this.setState({ showErrorMessage: true })
+            } else {
+                this.props.updateDataArray(interval, data);
+                this.close();
+            }
+        });
+    }
+
+    fetchCityWeatherData() {
+        const { city } = this.state;
+
+        return fetch(`${url}?${queryString}${city}&${units}&${keyQuery}${key}`)
             .then(response => response.json())
-            .then(result => this.props.updateDataArray(interval, result))
+            .then(result => result )
             .catch(e => e);
-
-        this.close();
     }
 
     render() {
 
         const {
             showModal,
-            city
+            city,
+            showErrorMessage
         } = this.state;
 
         return (
@@ -71,6 +85,11 @@ class Overlay extends Component {
 
                     <Modal.Body>
                         <form>
+                            {showErrorMessage &&
+                                <Alert bsStyle="warning">
+                                    Unfortunately we haven't found this city. Please try another name.
+                                </Alert>
+                            }
 
                             <FieldGroup
                                 id="cityName"
