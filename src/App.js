@@ -1,10 +1,15 @@
 import React, { Component } from 'react';
-import { ListGroup, ListGroupItem } from 'react-bootstrap';
 import Overlay from './Overlay';
+import Tile from './Tile';
 import './App.css';
 
 const icon_url = 'http://openweathermap.org/img/w/';
 const suffix = '.png';
+const url = 'http://api.openweathermap.org/data/2.5/weather';
+const queryString = 'q=';
+const keyQuery = 'APPID=';
+const key = 'c1bbacb38ffa09548e071d66119cf44d';
+const units = 'units=metric';
 
 class App extends Component {
 
@@ -13,6 +18,7 @@ class App extends Component {
 
         this.state = {
             data: [],
+            interval: 0
         };
         this.updateDataArray = this.updateDataArray.bind(this);
     }
@@ -24,13 +30,22 @@ class App extends Component {
         const conditions = { ...result.main, ...result.wind };
 
         this.setState({
-            data: [...this.state.data, {name, weather, iconSrc, conditions}]
+            data: [...this.state.data, {name, weather, iconSrc, conditions}],
+            interval
         });
+    }
+
+    fetchCityWeatherData(city) {
+        return fetch(`${url}?${queryString}${city}&${units}&${keyQuery}${key}`)
+            .then(response => response.json())
+            .then(result => result )
+            .catch(e => e);
     }
 
     render() {
         const {
-            data
+            data,
+            interval
         } = this.state;
 
         return (
@@ -38,22 +53,11 @@ class App extends Component {
                 <div className="Flex-container">
                     {data &&
                         data.map((obj, index) =>
-                            <div className="Flex-item">
-                                <div className="Tile">
-                                    <h3>{obj.name}</h3>
-                                    <h2>{obj.weather.description}</h2>
-                                    <img src={obj.iconSrc} width='100px' alt={obj.weather.description} />
-                                    <ListGroup>
-                                        <ListGroupItem><strong>Temperature:</strong> {obj.conditions.temp}&#8451;</ListGroupItem>
-                                        <ListGroupItem><strong>Humidity:</strong> {obj.conditions.humidity}%</ListGroupItem>
-                                        <ListGroupItem><strong>Wind speed:</strong> {obj.conditions.speed}m/s</ListGroupItem>
-                                    </ListGroup>
-                                </div>
-                            </div>
+                            <Tile obj={obj} interval={interval} />
                         )
                     }
                 </div>
-                <Overlay updateDataArray={this.updateDataArray} />
+                <Overlay updateDataArray={this.updateDataArray} fetchCityWeatherData={this.fetchCityWeatherData} />
             </section>
         );
     }

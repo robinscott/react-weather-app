@@ -6,8 +6,8 @@
 }
 
 .Flex-item {
-  -webkit-flex: 1 0 auto;
-  flex: 1 0 auto;
+  -webkit-flex: 1 0 200px;
+  flex: 1 0 200px;
 }
 
 .Tile {

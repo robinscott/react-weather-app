@@ -2,12 +2,6 @@ import React, { Component } from 'react';
 import { Modal, Button, FormGroup, ControlLabel, FormControl, Alert } from 'react-bootstrap';
 import FieldGroup from './FieldGroup';
 
-const url = 'http://api.openweathermap.org/data/2.5/weather';
-const queryString = 'q=';
-const keyQuery = 'APPID=';
-const key = 'c1bbacb38ffa09548e071d66119cf44d';
-const units = 'units=metric';
-
 class Overlay extends Component {
 
     constructor() {
@@ -16,7 +10,7 @@ class Overlay extends Component {
         this.state = {
             showModal: false,
             city: '',
-            interval: '',
+            interval: 300,
             showErrorMessage: false
         };
 
@@ -36,14 +30,14 @@ class Overlay extends Component {
 
     handleChange(property) {
         return event => {
-            this.setState({ [property]: event.target.value })
+            property !== "interval" ? this.setState({ [property]: event.target.value }) : this.setState({ [property]: parseInt(event.target.value, 10) })
         }
     }
 
     handleClick() {
-        const { interval } = this.state;
+        const { interval, city } = this.state;
 
-        this.fetchCityWeatherData().then(data => {
+        this.props.fetchCityWeatherData(city).then(data => {
             if(data.cod && data.message) {
                 this.setState({ showErrorMessage: true })
             } else {
@@ -51,15 +45,6 @@ class Overlay extends Component {
                 this.close();
             }
         });
-    }
-
-    fetchCityWeatherData() {
-        const { city } = this.state;
-
-        return fetch(`${url}?${queryString}${city}&${units}&${keyQuery}${key}`)
-            .then(response => response.json())
-            .then(result => result )
-            .catch(e => e);
     }
 
     render() {
@@ -104,9 +89,10 @@ class Overlay extends Component {
                                 <FormControl
                                         componentClass="select"
                                         placeholder="select"
+                                        value={this.state.interval}
                                         onChange={this.handleChange("interval")} >
-                                    <option value="1">1 minute</option>
-                                    <option value="2">2 minutes</option>
+                                    <option value="300">5 minutes</option>
+                                    <option value="600">10 minutes</option>
                                 </FormControl>
                             </FormGroup>
 
